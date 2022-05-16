@@ -31,27 +31,23 @@ export const fetchFile = () => {
       return info;
     });
 
-    let index = 0;
     const testCases: Record<string, DataUnit> = {};
-
-    while (index < trimmedSentences.length) {
-      const currentItem = trimmedSentences[index];
-      const correspondingImageId = getImageIdFromSentenceId(currentItem[0]);
+    trimmedSentences.forEach((item) => {
+      const correspondingImageId = getImageIdFromSentenceId(item[0]);
       if (!corruptedImageId[correspondingImageId]) {
         if (!testCases[correspondingImageId]) {
           testCases[correspondingImageId] = {
-            words: [...currentItem[9].split("|")],
+            words: [...item[9].split("|")],
             imageId: correspondingImageId,
           };
         }
 
         testCases[correspondingImageId].words = [
           ...testCases[correspondingImageId].words,
-          ...currentItem[9].split("|"),
+          ...item[9].split("|"),
         ];
       }
-      index++;
-    }
+    });
 
     const validDataCount = Object.keys(testCases).length;
     const corruptedDataCount = Object.keys(corruptedImageId).length;

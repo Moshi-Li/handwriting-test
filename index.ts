@@ -1,1 +1,1 @@
-import "./utility";
+import "./fetch/gcp";
