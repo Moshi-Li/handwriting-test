@@ -37,7 +37,7 @@ export const fetchFile = () => {
       if (!corruptedImageId[correspondingImageId]) {
         if (!testCases[correspondingImageId]) {
           testCases[correspondingImageId] = {
-            words: [...item[9].split("|")],
+            words: [],
             imageId: correspondingImageId,
           };
         }
@@ -64,5 +64,3 @@ export const fetchFile = () => {
     console.log(e);
   }
 };
-
-const data = fetchFile();
