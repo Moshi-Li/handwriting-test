@@ -1,8 +1,8 @@
 import GVision from "@google-cloud/vision";
 import Path from "path";
-import { fetchFile } from "../utility";
+import { ImageMeta } from "../utility/data";
 
-const FILE_URL = "../tests/images/a01-007.png";
+const IMAGE_DIR_PATH = "../tests/images";
 
 async function quickstart() {
   // Imports the Google Cloud client library
@@ -10,16 +10,78 @@ async function quickstart() {
   // Creates a client
   const client = new GVision.ImageAnnotatorClient();
 
+  try {
+    const credential = await client.auth.getCredentials();
+  } catch (e) {}
+
   // Performs label detection on the image file
-  const result = await client.textDetection(Path.resolve(__dirname, FILE_URL));
-  console.log(
-    result[0].textAnnotations
-      ? result[0].textAnnotations.forEach((item) =>
-          console.log(item.description)
-        )
-      : "error here"
-  );
-  const data = fetchFile();
-  console.log(data ? data["a01-007u"] : "e");
+  //const result = await client.textDetection(Path.resolve(__dirname, FILE_URL));
 }
-quickstart();
+
+interface ResultGCP {
+  imageId: string;
+  success: boolean;
+  value?: string;
+  reason?: any;
+}
+
+export const testImages = async (
+  randomImageIds: string[],
+  imageMeta: Record<string, ImageMeta>
+) => {
+  const client = new GVision.ImageAnnotatorClient();
+
+  const requests = randomImageIds.map((id) =>
+    client.textDetection(Path.resolve(__dirname, `${IMAGE_DIR_PATH}/${id}.png`))
+  );
+  const responses = await Promise.allSettled(requests);
+
+  const result: ResultGCP[] = responses.map((response, index) => {
+    if (response.status === "fulfilled") {
+      return {
+        imageId: randomImageIds[index],
+        success: true,
+        value: response.value[0].fullTextAnnotation?.text as string,
+      };
+    } else {
+      return {
+        imageId: randomImageIds[index],
+        success: false,
+        value: response.reason,
+      };
+    }
+  });
+
+  result.forEach((item) => {
+    if (item.success && item.value) {
+      const { imageId } = item;
+      const [, , ...lines] = item.value.split("-\n").join("").split("\n");
+      //console.log(lines.join(" ").split(" "));
+      //item.value.replace(/[^\w\s\']|_/g, "").replace(/\s+/g, " ");
+      const words = lines
+        .join(" ")
+        .replace(/[^\w\s\']|_/g, "")
+        .replace(/\s+/g, " ")
+        .split(" ");
+
+      const testAnswer = words.slice(0, imageMeta[imageId].wordsCount);
+      const testResult = words.slice(
+        imageMeta[imageId].wordsCount,
+        words.length
+      );
+
+      console.log(`\nTest for imageID: ${imageId}`);
+      console.log(`wordCount: ${imageMeta[imageId].wordsCount}`);
+      console.log(`\ntestAnswer:`);
+      console.log(testAnswer);
+      console.log(`\ntestResult:`);
+      console.log(testResult);
+    }
+  });
+};
+
+export const authCheck = async () => {
+  const client = new GVision.ImageAnnotatorClient();
+  const credential = await client.auth.getCredentials();
+  console.log(`Running with user: ${credential.client_email}`);
+};
