@@ -21,12 +21,17 @@ export class TestTool {
 
   private getRandomImageId(imageCount: number) {
     const result: string[] = [];
+    const map: Record<string, boolean> = {};
     let count = 0;
     while (count < imageCount) {
-      result.push(
-        this.imageNames[Math.floor(Math.random() * this.imageNames.length)]
-      );
-      count++;
+      const imageName =
+        this.imageNames[Math.floor(Math.random() * this.imageNames.length)];
+
+      if (!map[imageName]) {
+        result.push(imageName);
+        map[imageName] = true;
+        count++;
+      }
     }
     return result;
   }
@@ -61,8 +66,8 @@ export class TestTool {
   }
 
   runTest(type: "aws" | "gcp", imageCount: number) {
-    if (type === "aws") this.runAWS(imageCount);
-    if (type === "gcp") this.runGCP(imageCount);
+    if (type === "aws") return this.runAWS(imageCount);
+    if (type === "gcp") return this.runGCP(imageCount);
   }
 
   printStatus() {
