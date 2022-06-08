@@ -40,7 +40,7 @@ export class TestTool {
     try {
       await gcpAuthCheck();
     } catch (e) {
-      throw new Error("Client authentication failed");
+      throw new Error("GCP Client authentication failed");
     }
 
     const randomImageIds = this.getRandomImageId(imageCount);
@@ -55,7 +55,7 @@ export class TestTool {
     try {
       await awsAuthCheck();
     } catch (e) {
-      throw new Error("Client authentication failed");
+      throw new Error("AWS Client authentication failed");
     }
 
     const randomImageIds = this.getRandomImageId(imageCount);
@@ -70,8 +70,20 @@ export class TestTool {
     if (type === "gcp") return this.runGCP(imageCount);
   }
 
-  printStatus() {
-    console.log(this.imageMeta);
-    console.log(this.imageNames);
+  async printStatus() {
+    console.log(`Meta data count: ${Object.keys(this.imageMeta).length}`);
+    console.log(`Image names count: ${this.imageNames.length}`);
+
+    try {
+      await awsAuthCheck();
+    } catch (e) {
+      throw new Error("AWS Client authentication failed");
+    }
+
+    try {
+      await gcpAuthCheck();
+    } catch (e) {
+      throw new Error("GCP Client authentication failed");
+    }
   }
 }

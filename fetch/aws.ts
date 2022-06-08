@@ -78,6 +78,6 @@ export const testImages = async (
 export const authCheck = async () => {
   const client = new TextractClient({ region: "us-east-1" });
   const credential = await client.config.credentials();
-  console.log(`Running with user: ${credential.accessKeyId}`);
+  console.log(`Running with AWS user: ${credential.accessKeyId}`);
   client.destroy();
 };

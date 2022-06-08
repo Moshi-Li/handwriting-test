@@ -83,6 +83,6 @@ export const testImages = async (
 export const authCheck = async () => {
   const client = new GVision.ImageAnnotatorClient();
   const credential = await client.auth.getCredentials();
-  console.log(`Running with user: ${credential.client_email}`);
+  console.log(`Running with GCP user: ${credential.client_email}`);
   client.close();
 };
