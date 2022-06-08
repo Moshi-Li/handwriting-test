@@ -4,6 +4,11 @@ import {
   testImages as gcpTestImages,
 } from "../fetch/gcp";
 
+import {
+  authCheck as awsAuthCheck,
+  testImages as awsTestImages,
+} from "../fetch/aws";
+
 export class TestTool {
   imageMeta: Record<string, ImageMeta>;
   imageNames: string[];
@@ -41,8 +46,23 @@ export class TestTool {
     } catch (e) {}
   }
 
-  runTest(type: string, imageCount: number) {
-    this.runGCP(imageCount);
+  private async runAWS(imageCount: number) {
+    try {
+      await awsAuthCheck();
+    } catch (e) {
+      throw new Error("Client authentication failed");
+    }
+
+    const randomImageIds = this.getRandomImageId(imageCount);
+
+    try {
+      await awsTestImages(randomImageIds, this.imageMeta);
+    } catch (e) {}
+  }
+
+  runTest(type: "aws" | "gcp", imageCount: number) {
+    if (type === "aws") this.runAWS(imageCount);
+    if (type === "gcp") this.runGCP(imageCount);
   }
 
   printStatus() {

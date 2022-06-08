@@ -47,7 +47,7 @@ export const testImages = async (
       return {
         imageId: randomImageIds[index],
         success: false,
-        value: response.reason,
+        reason: response.reason,
       };
     }
   });
@@ -84,4 +84,5 @@ export const authCheck = async () => {
   const client = new GVision.ImageAnnotatorClient();
   const credential = await client.auth.getCredentials();
   console.log(`Running with user: ${credential.client_email}`);
+  client.close();
 };
