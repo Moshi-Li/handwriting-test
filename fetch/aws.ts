@@ -5,6 +5,7 @@ import {
 import { readFileSync } from "fs";
 import Path from "path";
 import { ImageMeta } from "../utility/data";
+import { compare } from "../utility/comparison";
 
 const IMAGE_DIR_PATH = "../tests/images";
 
@@ -71,6 +72,12 @@ export const testImages = async (
       console.log(testAnswer);
       console.log(`\ntestResult:`);
       console.log(testResult);
+      console.log(
+        `Accuracy Rate: ${compare(
+          testResult as string[],
+          testAnswer as string[]
+        )}`
+      );
     }
   });
 };
