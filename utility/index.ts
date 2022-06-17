@@ -76,73 +76,87 @@ export class TestTool {
   }
 
   async myTest(imageCount: number) {
-    const randomImageIds = this.getRandomImageId(imageCount);
+    try {
+      const randomImageIds = this.getRandomImageId(imageCount);
 
-    const Map: Record<string, any> = {};
+      const Map: Record<string, any> = {};
 
-    const gcpResult = (await this.runGCP(randomImageIds)) as unifiedResult[];
-    const awsResult = (await this.runAWS(randomImageIds)) as unifiedResult[];
+      const awsResult = (await this.runAWS(randomImageIds)) as unifiedResult[];
+      const gcpResult = (await this.runGCP(randomImageIds)) as unifiedResult[];
 
-    randomImageIds.forEach((imageId) => (Map[imageId] = {}));
+      randomImageIds.forEach((imageId) => (Map[imageId] = {}));
 
-    gcpResult?.forEach((item) => {
-      Map[item?.imageId as string]["gcp"] = item;
-    });
-    awsResult?.forEach((item) => {
-      Map[item?.imageId as string]["aws"] = item;
-    });
+      gcpResult?.forEach((item) => {
+        Map[item?.imageId as string]["gcp"] = item;
+      });
+      awsResult?.forEach((item) => {
+        Map[item?.imageId as string]["aws"] = item;
+      });
 
-    console.log("\n===Report===\n");
-    console.log(`Number of images selected: ${randomImageIds.length}`);
-    console.log(`GCP Success Req Count: ${gcpResult?.length}`);
-    console.log(`AWS Success Req Count: ${awsResult?.length}`);
+      console.log("\n===Report===\n");
+      console.log(`Number of images selected: ${randomImageIds.length}`);
+      console.log(`GCP Success Req Count: ${gcpResult?.length}`);
+      console.log(`AWS Success Req Count: ${awsResult?.length}`);
 
-    console.log("\n ===AWS Accuracy Metrics===");
-    const awsAccuracy = awsResult
-      .sort((a, b) => {
-        if (a.accuracy > b.accuracy) return 1;
-        if (a.accuracy < b.accuracy) return -1;
-        return 0;
-      })
-      .map((item) => item.accuracy);
+      console.log("\n ===AWS Accuracy Metrics===");
+      const awsAccuracy = awsResult
+        .sort((a, b) => {
+          if (a.accuracy > b.accuracy) return 1;
+          if (a.accuracy < b.accuracy) return -1;
+          return 0;
+        })
+        .map((item) => item.accuracy);
 
-    console.log(
-      `High: ${awsAccuracy[awsAccuracy.length - 1].toFixed(
-        2
-      )}, Low: ${awsAccuracy[0].toFixed(2)}, Avg: ${(
-        awsAccuracy.reduce((accumulator, a) => accumulator + a, 0) /
-        awsAccuracy.length
-      ).toFixed(2)}, Median: ${awsAccuracy[
-        Math.floor(awsAccuracy.length / 2)
-      ].toFixed(2)}\n`
-    );
+      console.log(
+        `High: ${awsAccuracy[awsAccuracy.length - 1].toFixed(
+          2
+        )}, Low: ${awsAccuracy[0].toFixed(2)}, Avg: ${(
+          awsAccuracy.reduce((accumulator, a) => accumulator + a, 0) /
+          awsAccuracy.length
+        ).toFixed(2)}, Median: ${awsAccuracy[
+          Math.floor(awsAccuracy.length / 2)
+        ].toFixed(2)}\n`
+      );
 
-    console.log("\n ===GCP Accuracy Metrics===");
+      console.log("\n ===GCP Accuracy Metrics===");
 
-    const gcpAccuracy = gcpResult
-      .sort((a, b) => {
-        if (a.accuracy > b.accuracy) return 1;
-        if (a.accuracy < b.accuracy) return -1;
-        return 0;
-      })
-      .map((item) => item.accuracy);
+      const gcpAccuracy = gcpResult
+        .sort((a, b) => {
+          if (a.accuracy > b.accuracy) return 1;
+          if (a.accuracy < b.accuracy) return -1;
+          return 0;
+        })
+        .map((item) => item.accuracy);
 
-    console.log(
-      `High: ${gcpAccuracy[gcpAccuracy.length - 1].toFixed(
-        2
-      )}, Low: ${gcpAccuracy[0].toFixed(2)}, Avg: ${(
-        gcpAccuracy.reduce((accumulator, a) => accumulator + a, 0) /
-        gcpAccuracy.length
-      ).toFixed(2)}, Median: ${gcpAccuracy[
-        Math.floor(gcpAccuracy.length / 2)
-      ].toFixed(2)}\n`
-    );
+      console.log(
+        `High: ${gcpAccuracy[gcpAccuracy.length - 1].toFixed(
+          2
+        )}, Low: ${gcpAccuracy[0].toFixed(2)}, Avg: ${(
+          gcpAccuracy.reduce((accumulator, a) => accumulator + a, 0) /
+          gcpAccuracy.length
+        ).toFixed(2)}, Median: ${gcpAccuracy[
+          Math.floor(gcpAccuracy.length / 2)
+        ].toFixed(2)}\n`
+      );
 
-    const path = Path.resolve(`./output/${new Date().getTime()}.json`);
-    const file = openSync(path, "w");
-    writeFileSync(file, JSON.stringify(Map));
-    closeSync(file);
-    console.log(`The detailed results are stored at ${path}\n`);
+      try {
+        const path = Path.join(
+          __dirname,
+          "..",
+          "output",
+          `${new Date().getTime()}.json`
+        );
+
+        const file = openSync(path, "w");
+        writeFileSync(file, JSON.stringify(Map));
+        closeSync(file);
+        console.log(`The detailed results are stored at ${path}\n`);
+      } catch (e) {
+        console.log(e);
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   async printStatus() {

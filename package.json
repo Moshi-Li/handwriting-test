@@ -14,6 +14,7 @@
     "typescript": "^4.6.4"
   },
   "scripts": {
-    "start": "ts-node ./index.ts"
+    "start": "ts-node ./index.ts",
+    "start_uncap": "node --max-old-space-size=6144 -r ts-node/register ./index.ts"
   }
 }
