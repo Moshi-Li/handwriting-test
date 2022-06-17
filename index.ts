@@ -5,8 +5,9 @@ const runner = new TestTool();
 
 const main = async () => {
   //runner.printStatus();
-  await runner.runTest("aws", 1);
-  await runner.runTest("gcp", 1);
+  //await runner.runTest("aws", 1);
+  //await runner.runTest("gcp", 1);
+  await runner.myTest(5);
 };
 
 main();

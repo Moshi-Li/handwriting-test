@@ -14,5 +14,5 @@ export const compare = (result: string[], answer: string[]) => {
     totalCount += map[key][1];
   });
 
-  return ((correctCount / totalCount) * 100).toFixed(2);
+  return (correctCount / totalCount) * 100;
 };

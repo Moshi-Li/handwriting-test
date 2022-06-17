@@ -53,33 +53,36 @@ export const testImages = async (
     }
   });
 
-  result.forEach((item) => {
-    if (item.success && item.value) {
-      const { imageId } = item;
-      const [, , ...lines] = item.value.split("-\n").join("").split("\n");
-      //console.log(lines.join(" ").split(" "));
-      //item.value.replace(/[^\w\s\']|_/g, "").replace(/\s+/g, " ");
-      const words = lines
-        .join(" ")
-        .replace(/[^\w\s\']|_/g, "")
-        .replace(/\s+/g, " ")
-        .split(" ");
+  return result
+    .map((item) => {
+      if (item.success && item.value) {
+        const { imageId } = item;
+        const [, , ...lines] = item.value.split("-\n").join("").split("\n");
+        //console.log(lines.join(" ").split(" "));
+        //item.value.replace(/[^\w\s\']|_/g, "").replace(/\s+/g, " ");
+        const words = lines
+          .join(" ")
+          .replace(/[^\w\s\']|_/g, "")
+          .replace(/\s+/g, " ")
+          .split(" ");
 
-      const testAnswer = words.slice(0, imageMeta[imageId].wordsCount);
-      const testResult = words.slice(
-        imageMeta[imageId].wordsCount,
-        words.length
-      );
+        const testAnswer = words.slice(0, imageMeta[imageId].wordsCount);
+        const testResult = words.slice(
+          imageMeta[imageId].wordsCount,
+          words.length
+        );
 
-      console.log(`\nTest for imageID: ${imageId}`);
-      console.log(`wordCount: ${imageMeta[imageId].wordsCount}`);
-      console.log(`\ntestAnswer:`);
-      console.log(testAnswer);
-      console.log(`\ntestResult:`);
-      console.log(testResult);
-      console.log(`Accuracy Rate: ${compare(testResult, testAnswer)}`);
-    }
-  });
+        return {
+          imageId,
+          testAnswer,
+          testResult,
+          accuracy: compare(testResult as string[], testAnswer as string[]),
+        };
+      } else {
+        return undefined;
+      }
+    })
+    .filter((item) => item !== undefined);
 };
 
 export const authCheck = async () => {

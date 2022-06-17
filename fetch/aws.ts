@@ -57,29 +57,27 @@ export const testImages = async (
     }
   });
 
-  result.forEach((item) => {
-    if (item.success && item.value) {
-      const { imageId } = item;
-      const testAnswer = item.value.slice(0, imageMeta[imageId].wordsCount);
-      const testResult = item.value.slice(
-        imageMeta[imageId].wordsCount,
-        item.value.length
-      );
+  return result
+    .map((item) => {
+      if (item.success && item.value) {
+        const { imageId } = item;
+        const testAnswer = item.value.slice(0, imageMeta[imageId].wordsCount);
+        const testResult = item.value.slice(
+          imageMeta[imageId].wordsCount,
+          item.value.length
+        );
 
-      console.log(`\nTest for imageID: ${imageId}`);
-      console.log(`wordCount: ${imageMeta[imageId].wordsCount}`);
-      console.log(`\ntestAnswer:`);
-      console.log(testAnswer);
-      console.log(`\ntestResult:`);
-      console.log(testResult);
-      console.log(
-        `Accuracy Rate: ${compare(
-          testResult as string[],
-          testAnswer as string[]
-        )}`
-      );
-    }
-  });
+        return {
+          imageId,
+          testAnswer,
+          testResult,
+          accuracy: compare(testResult as string[], testAnswer as string[]),
+        };
+      } else {
+        return undefined;
+      }
+    })
+    .filter((item) => item !== undefined);
 };
 
 export const authCheck = async () => {
